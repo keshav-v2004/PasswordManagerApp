@@ -1,14 +1,17 @@
 package com.example.passwordmanagerseconddraft.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
@@ -27,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.passwordmanagerseconddraft.Screens
 import com.example.passwordmanagerseconddraft.db.EachPassword
@@ -65,21 +70,37 @@ fun HomeScreen(
                 .fillMaxSize()
 
         ) {
-            Text(text = "all saved passwords shown here")
+            Text(
+                text = "all saved passwords shown here",
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 30.sp
+
+            )
 
             allPasswords?.let {
                 if (!allPasswords.isNullOrEmpty()){
-                    LazyColumn() {
+                    LazyColumn(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = modifier
+                            .fillMaxWidth()
+                    ) {
                         items(allPasswords!!){eachpass->
                             EachPasswordCard(
                                 password = eachpass ,
                                 homeScreenViewModel,
-                                navController
+                                navController,
                             )
                         }
                     }
                 }else{
-                    Text(text = "no saved passwords")
+                    Spacer(modifier = Modifier.height(125.dp))
+                    Text(
+                        text = "no saved passwords currently",
+                        fontSize = 60.sp,
+                        lineHeight = 60.sp,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
@@ -118,42 +139,81 @@ fun EachPasswordCard(
 ) {
     Card(
         modifier = modifier
+            .padding(12.dp)
 
 
     ) {
         Column(
             modifier = modifier
-
+                .padding(10.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+
                 modifier = modifier
+                    .fillMaxWidth()
 
             ) {
-                Text(text = "password source : ")
-                Text(text = password.source)
+                Text(
+                    text = "password source : ",
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier
+
+                )
+                Text(
+                    text = password.source,
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                )
 
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+
                 modifier = modifier
+                    .fillMaxWidth()
 
             ) {
-                Text(text = "username/loginId : ")
-                Text(text = password.username_loginId)
+                Text(
+                    text = "username/loginId : ",
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = password.username_loginId,
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                )
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+
                 modifier = modifier
+                    .fillMaxWidth()
 
             ) {
-                Text(text = "password : ")
-                Text(text = password.password)
+                Text(
+                    text = "password : ",
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier
+
+                )
+                Text(
+                    text = password.password,
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                )
             }
 
+            Spacer(modifier = Modifier.height(25.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
                 modifier = modifier
+                    .fillMaxWidth()
+                    
             ){
                 OutlinedButton(
                     onClick = {
@@ -162,6 +222,8 @@ fun EachPasswordCard(
                 ) {
                     Text(text = "Delete password")
                 }
+
+                Spacer(modifier = Modifier.width(25.dp))
 
                 OutlinedButton(
                     onClick = {

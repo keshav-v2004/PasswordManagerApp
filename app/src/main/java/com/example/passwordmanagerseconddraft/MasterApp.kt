@@ -35,7 +35,7 @@ fun MasterApp(
 
 
     NavHost(
-        navController = navController, startDestination = Screens.Home.name
+        navController = navController, startDestination = Screens.Login.name
     ) {
 
         composable(route = Screens.Home.name , content = {
@@ -45,10 +45,10 @@ fun MasterApp(
             )
         })
         composable(route = Screens.Login.name , content = {
-            LoginPage()
+            LoginPage(navController)
         })
         composable(route = Screens.Signup.name , content = {
-            SignupPage()
+            SignupPage(navController)
         })
         composable(route = Screens.Add.name , content = {
             AddScreen(
