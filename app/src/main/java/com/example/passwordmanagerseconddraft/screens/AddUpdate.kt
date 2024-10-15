@@ -153,6 +153,8 @@ fun UpdateScreen(
         mutableStateOf(password.password)
     }
 
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             AppHeading()
@@ -221,6 +223,7 @@ fun UpdateScreen(
                         newLogin = username_Loginid,
                         id = password.id
                     )
+                    Toast.makeText(context,"Password updated successfully" , Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
             ) {
