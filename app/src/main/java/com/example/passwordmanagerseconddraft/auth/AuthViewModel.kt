@@ -1,6 +1,8 @@
 package com.example.passwordmanagerseconddraft.auth
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -125,6 +127,30 @@ class AuthViewModel : ViewModel() {
         auth.signOut()
         appAuthState = AppAuthState.unauthenticated
         Log.i("current user is : " , currentUserId.toString())
+    }
+
+    fun deleteAcc(context: Context) {
+        if (auth.currentUser != null) {
+            try {
+                auth.currentUser!!.delete().addOnSuccessListener {
+                    Toast.makeText(
+                        context,
+                        "Deleting account",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                appAuthState = AppAuthState.unauthenticated
+
+            }catch (e:Error){
+                Toast.makeText(
+                    context,
+                    "Something went wrong",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
     }
 
 }
