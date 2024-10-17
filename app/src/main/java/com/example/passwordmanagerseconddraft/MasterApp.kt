@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.passwordmanagerseconddraft.auth.AuthViewModel
+import com.example.passwordmanagerseconddraft.auth.LoadingScreen
 import com.example.passwordmanagerseconddraft.auth.LoginPage
 import com.example.passwordmanagerseconddraft.auth.SignupPage
 import com.example.passwordmanagerseconddraft.screens.AddScreen
@@ -20,7 +21,8 @@ enum class Screens{
     Signup,
     Home,
     Add,
-    Update
+    Update,
+    Loading
 }
 
 
@@ -49,14 +51,16 @@ fun MasterApp(
             LoginPage(
                 authViewModel = authViewModel,
                 navigateToSignupPage = {navController.navigate(Screens.Signup.name)},
-                navigateToHomeScreen = {navController.navigate(Screens.Home.name)}
+                navigateToHomeScreen = {navController.navigate(Screens.Home.name)},
+                navigateToLoadingScreen = {navController.navigate(Screens.Loading.name)}
             )
         })
         composable(route = Screens.Signup.name , content = {
             SignupPage(
                 authViewModel = authViewModel,
                 navigateToLoginPage = {navController.navigate(Screens.Login.name)},
-                navigateToHomeScreen = {navController.navigate(Screens.Home.name)}
+                navigateToHomeScreen = {navController.navigate(Screens.Home.name)},
+                navigateToLoadingScreen = {navController.navigate(Screens.Loading.name)}
             )
         })
         composable(route = Screens.Add.name , content = {
@@ -73,5 +77,15 @@ fun MasterApp(
             )
         })
 
+        composable(
+            route = Screens.Loading.name,
+            content = {
+                LoadingScreen(
+                    authViewModel = authViewModel,
+                    navigateToLoginPage = {navController.navigate(Screens.Login.name)},
+                    navigateToHomeScreen = {navController.navigate(Screens.Home.name)}
+                )
+            }
+        )
     }
 }

@@ -60,6 +60,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = authViewModel.appAuthState) {
         when(authViewModel.appAuthState){
             is AuthViewModel.AppAuthState.unauthenticated->navController.navigate(Screens.Login.name)
+            is AuthViewModel.AppAuthState.Loading -> navController.navigate(Screens.Loading.name)
             else ->Unit
         }
 
@@ -141,6 +142,7 @@ fun HomeScreen(
                                 "Signing out",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            navController.navigate(Screens.Loading.name)
                         }
                     ) {
                         Text(text = "SignOut")
