@@ -12,4 +12,6 @@ data class EachPassword(
     var source : String,
     var username_loginId : String,
     var password:String,
+
+    var currentUserId : String?
 )
