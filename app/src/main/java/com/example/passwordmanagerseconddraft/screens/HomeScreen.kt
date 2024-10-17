@@ -1,6 +1,8 @@
 package com.example.passwordmanagerseconddraft.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -24,29 +28,44 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.passwordmanagerseconddraft.Screens
+import com.example.passwordmanagerseconddraft.auth.AuthViewModel
 import com.example.passwordmanagerseconddraft.db.EachPassword
 
 lateinit var setUpdateScreens : EachPassword
 
+
+
 @Composable
 fun HomeScreen(
     homeScreenViewModel: HomeScreenViewModel,
+    authViewModel: AuthViewModel,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
 
     val allPasswords by homeScreenViewModel.getAllPasswords().observeAsState()
 
+    LaunchedEffect(key1 = authViewModel.appAuthState) {
+        when(authViewModel.appAuthState){
+            is AuthViewModel.AppAuthState.unauthenticated->navController.navigate(Screens.Login.name)
+            else ->Unit
+        }
+
+    }
+
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             AppHeading()
@@ -59,10 +78,9 @@ fun HomeScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
-        }
+        },
     ){
         Column(
-
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .padding(it)
@@ -77,32 +95,63 @@ fun HomeScreen(
                 lineHeight = 30.sp
 
             )
-
-            allPasswords?.let {
-                if (!allPasswords.isNullOrEmpty()){
-                    LazyColumn(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = modifier
-                            .fillMaxWidth()
-                    ) {
-                        items(allPasswords!!){eachpass->
-                            EachPasswordCard(
-                                password = eachpass ,
-                                homeScreenViewModel,
-                                navController,
-                            )
+            Box{
+                allPasswords?.let {
+                    if (!allPasswords.isNullOrEmpty()){
+                        LazyColumn(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = modifier
+                                .fillMaxWidth()
+                        ) {
+                            items(allPasswords!!){eachpass->
+                                EachPasswordCard(
+                                    password = eachpass ,
+                                    homeScreenViewModel,
+                                    navController,
+                                )
+                            }
                         }
+                    }else{
+                        Spacer(modifier = Modifier.height(125.dp))
+                        Text(
+                            text = "no saved passwords currently",
+                            fontSize = 60.sp,
+                            lineHeight = 60.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
-                }else{
-                    Spacer(modifier = Modifier.height(125.dp))
-                    Text(
-                        text = "no saved passwords currently",
-                        fontSize = 60.sp,
-                        lineHeight = 60.sp,
-                        textAlign = TextAlign.Center
-                    )
                 }
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(bottom = 25.dp)
+                ) {
+                    Button(
+                        colors = ButtonColors(
+                            containerColor = Color.Red,
+                            contentColor = Color.White,
+                            disabledContentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified
+                        ),
+                        onClick = {
+                            authViewModel.signOut()
+                            Toast.makeText(
+                                context,
+                                "Signing out",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    ) {
+                        Text(text = "SignOut")
+                    }
+                }
+
             }
+
+
+            Spacer(modifier = Modifier.weight(1f))
+
         }
     }
 }
@@ -118,6 +167,7 @@ fun AppHeading(
                 text = "Password Manager",
                 textAlign = TextAlign.Center
             )
+
         },
         colors = TopAppBarColors(
             containerColor = Color.Magenta,
@@ -125,7 +175,7 @@ fun AppHeading(
             navigationIconContentColor = Color.Unspecified,
             titleContentColor = Color.Unspecified,
             actionIconContentColor = Color.Unspecified
-        )
+        ),
     )
 }
 

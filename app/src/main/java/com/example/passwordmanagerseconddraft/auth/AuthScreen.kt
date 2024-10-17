@@ -1,35 +1,37 @@
 package com.example.passwordmanagerseconddraft.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.passwordmanagerseconddraft.Screens
 import com.example.passwordmanagerseconddraft.screens.AppHeading
 
 @Composable
 fun LoginPage(
-    navController: NavController,
+    authViewModel: AuthViewModel,
+    navigateToSignupPage : ()->Unit,
+    navigateToHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var email by rememberSaveable {
@@ -37,6 +39,21 @@ fun LoginPage(
     }
     var password by rememberSaveable {
         mutableStateOf("")
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = authViewModel.appAuthState) {
+        when(authViewModel.appAuthState){
+            is AuthViewModel.AppAuthState.authenticated-> navigateToHomeScreen()
+            is AuthViewModel.AppAuthState.Error -> Toast.makeText(
+                context,
+                (authViewModel.appAuthState as AuthViewModel.AppAuthState.Error).errorMessage,
+                Toast.LENGTH_SHORT
+            ).show()
+            else->Unit
+        }
+
     }
 
     Scaffold(
@@ -79,15 +96,24 @@ fun LoginPage(
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
-                onClick = { /*TODO*/ }
+                onClick = {
+
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        authViewModel.login(email, password)
+                        Toast.makeText(context , "Logging in" , Toast.LENGTH_SHORT).show()
+
+
+                    }
+                    else {
+                        Toast.makeText(context , "Email or password cannot be empty" , Toast.LENGTH_SHORT).show()
+                    }
+                }
             ) {
                 Text(text = "Login")
             }
 
             TextButton(
-                onClick = {
-                    navController.navigate(Screens.Signup.name)
-                }
+                onClick = navigateToSignupPage
             ) {
                 Text(text = "Don't have a account , Signup Now")
             }
@@ -98,7 +124,9 @@ fun LoginPage(
 
 @Composable
 fun SignupPage(
-    navController: NavController,
+    authViewModel: AuthViewModel,
+    navigateToLoginPage: () -> Unit,
+    navigateToHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var email by rememberSaveable {
@@ -107,6 +135,22 @@ fun SignupPage(
     var password by rememberSaveable {
         mutableStateOf("")
     }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = authViewModel.appAuthState) {
+        when(authViewModel.appAuthState){
+            is AuthViewModel.AppAuthState.authenticated -> navigateToHomeScreen()
+            is AuthViewModel.AppAuthState.Error->Toast.makeText(
+                context ,
+                (authViewModel.appAuthState as AuthViewModel.AppAuthState.Error).errorMessage ,
+                Toast.LENGTH_SHORT)
+                .show()
+            else->Unit
+        }
+
+    }
+
     Scaffold(
         topBar = {
             AppHeading()
@@ -147,15 +191,23 @@ fun SignupPage(
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
-                onClick = { /*TODO*/ }
+                onClick = {
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        authViewModel.signUp(email, password)
+
+                        Toast.makeText(context , "Signing up" , Toast.LENGTH_SHORT).show()
+
+                    }
+                    else {
+                        Toast.makeText(context , "Email or password cannot be empty" , Toast.LENGTH_SHORT).show()
+                    }
+                }
             ) {
                 Text(text = "SignUp")
             }
 
             TextButton(
-                onClick = {
-                    navController.navigate(Screens.Login.name)
-                }
+                onClick = navigateToLoginPage
             ) {
                 Text(text = "Already have an account , Login Now")
             }
@@ -164,9 +216,23 @@ fun SignupPage(
     }
 }
 
+@Composable
+fun LoadingScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
 @Preview(showSystemUi = true)
 @Composable
 private fun preview() {
-    LoginPage(rememberNavController())
+//    LoginPage(rememberNavController())
 
 }

@@ -1,15 +1,14 @@
 package com.example.passwordmanagerseconddraft
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.passwordmanagerseconddraft.auth.AuthViewModel
 import com.example.passwordmanagerseconddraft.auth.LoginPage
 import com.example.passwordmanagerseconddraft.auth.SignupPage
-import com.example.passwordmanagerseconddraft.db.EachPassword
 import com.example.passwordmanagerseconddraft.screens.AddScreen
 import com.example.passwordmanagerseconddraft.screens.HomeScreen
 import com.example.passwordmanagerseconddraft.screens.HomeScreenViewModel
@@ -25,10 +24,11 @@ enum class Screens{
 }
 
 
-@SuppressLint("NewApi")
+
 @Composable
 fun MasterApp(
     homeScreenViewModel: HomeScreenViewModel,
+    authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
     val navController : NavHostController = rememberNavController()
@@ -41,14 +41,23 @@ fun MasterApp(
         composable(route = Screens.Home.name , content = {
             HomeScreen(
                 navController = navController,
-                homeScreenViewModel = homeScreenViewModel
+                homeScreenViewModel = homeScreenViewModel,
+                authViewModel = authViewModel,
             )
         })
         composable(route = Screens.Login.name , content = {
-            LoginPage(navController)
+            LoginPage(
+                authViewModel = authViewModel,
+                navigateToSignupPage = {navController.navigate(Screens.Signup.name)},
+                navigateToHomeScreen = {navController.navigate(Screens.Home.name)}
+            )
         })
         composable(route = Screens.Signup.name , content = {
-            SignupPage(navController)
+            SignupPage(
+                authViewModel = authViewModel,
+                navigateToLoginPage = {navController.navigate(Screens.Login.name)},
+                navigateToHomeScreen = {navController.navigate(Screens.Home.name)}
+            )
         })
         composable(route = Screens.Add.name , content = {
             AddScreen(
