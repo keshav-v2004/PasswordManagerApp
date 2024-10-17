@@ -1,6 +1,7 @@
 package com.example.passwordmanagerseconddraft.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,12 +15,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -42,13 +45,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.passwordmanagerseconddraft.R
 import com.example.passwordmanagerseconddraft.Screens
 import com.example.passwordmanagerseconddraft.auth.AuthViewModel
 import com.example.passwordmanagerseconddraft.db.EachPassword
+import kotlinx.coroutines.delay
 
 lateinit var setUpdateScreens : EachPassword
 
@@ -294,6 +300,32 @@ fun EachPasswordCard(
 
     modifier: Modifier = Modifier
 ) {
+    var isShowPass by remember {
+        mutableStateOf(false)
+    }
+
+
+
+    if (isShowPass){
+        AlertDialog(
+            onDismissRequest = {
+                isShowPass = false
+            },
+            title = {
+                Text(text = "Your password is : ${password.password}")
+            },
+            confirmButton = {
+                LaunchedEffect(key1 = isShowPass) {
+                    delay(500)
+                    isShowPass = false
+                }
+
+
+            }
+        )
+    }
+
+
     Card(
         modifier = modifier
             .padding(12.dp)
@@ -358,7 +390,7 @@ fun EachPasswordCard(
 
                 )
                 Text(
-                    text = password.password,
+                    text = "**********",
                     fontSize = 25.sp,
                     textAlign = TextAlign.Center,
                 )
@@ -367,29 +399,92 @@ fun EachPasswordCard(
             Spacer(modifier = Modifier.height(25.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = modifier
                     .fillMaxWidth()
                     
             ){
-                OutlinedButton(
+
+                IconButton(
                     onClick = {
                         homeScreenViewModel.deletePassword(id = password.id)
                     }
                 ) {
-                    Text(text = "Delete password")
+                    Icon(
+                        Icons.Default.Delete,
+                        null,
+                        tint = Color.Black,
+                        modifier = modifier
+                            .border(2.dp, Color.Black, CircleShape)
+                            .padding(5.dp)
+                    )
                 }
 
-                Spacer(modifier = Modifier.width(25.dp))
-
-                OutlinedButton(
+                IconButton(
                     onClick = {
                         setUpdateScreens = password
                         navController.navigate(Screens.Update.name)
                     }
                 ) {
-                    Text(text = "Modify")
+                    Icon(
+                        Icons.Default.Edit,
+                        null,
+                        tint = Color.Black,
+                        modifier = modifier
+                            .border(2.dp, Color.Black, CircleShape)
+                            .padding(5.dp)
+                    )
                 }
+                IconButton(
+                    onClick = {
+                        isShowPass = true
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_remove_red_eye_24),
+                        null,
+                        tint = Color.Black,
+                        modifier = modifier
+                            .border(2.dp, Color.Black, CircleShape)
+                            .padding(5.dp)
+                    )
+                }
+//                OutlinedButton(
+//                    onClick = {
+//                        homeScreenViewModel.deletePassword(id = password.id)
+//                    }
+//                ) {
+//                    Text(
+//                        text = "Delete\npassword",
+//                        fontSize = 16.sp
+//                    )
+//                }
+//
+//                OutlinedButton(
+//                    onClick = {
+//                        setUpdateScreens = password
+//                        navController.navigate(Screens.Update.name)
+//                    }
+//                ) {
+//                    Text(
+//                        text = "Modify",
+//                        fontSize = 16.sp
+//
+//                    )
+//                }
+//
+//                OutlinedButton(
+//                    onClick = {
+//                        setUpdateScreens = password
+//                        navController.navigate(Screens.Update.name)
+//                    }
+//                ) {
+//                    Text(
+//                        text = "View\nPassword",
+//                        fontSize = 16.sp
+//                    )
+//
+//                }
             }
 
         }
