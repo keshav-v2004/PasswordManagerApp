@@ -47,4 +47,11 @@ class HomeScreenViewModel : ViewModel() {
         }
     }
 
+    fun deleteAllRecordsForAnAccount(currentUserId : String){
+
+        viewModelScope.launch(Dispatchers.IO) {
+            passwordDao.deleteAllRecordsForAnAccount(currentUserId = currentUserId)
+        }
+    }
+
 }
