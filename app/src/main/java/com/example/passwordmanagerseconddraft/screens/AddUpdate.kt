@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -21,9 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.passwordmanagerseconddraft.db.EachPassword
+import com.example.passwordmanagerseconddraft.db.authViewModel
 
 @Composable
 fun AddScreen(
@@ -48,7 +52,9 @@ fun AddScreen(
 
     Scaffold(
         topBar = {
-            AppHeading()
+            AppHeading(
+                accountIconClicked = {}
+            )
         }
     ) { paddingValues->
 
@@ -70,7 +76,10 @@ fun AddScreen(
                         text = "enter source",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(Modifier.height(30.dp))
@@ -85,7 +94,11 @@ fun AddScreen(
                         text = "enter username/LoginId",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
+
             )
             Spacer(Modifier.height(30.dp))
 
@@ -99,7 +112,10 @@ fun AddScreen(
                         text = "enter password",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                )
             )
 
             Spacer(Modifier.height(30.dp))
@@ -111,7 +127,8 @@ fun AddScreen(
                             EachPassword(
                                 source = source,
                                 username_loginId = username_Loginid,
-                                password = password
+                                password = password,
+                                currentUserId = authViewModel.auth.currentUser?.email
                             )
                         )
                         navController.popBackStack()
@@ -157,7 +174,9 @@ fun UpdateScreen(
 
     Scaffold(
         topBar = {
-            AppHeading()
+            AppHeading(
+                accountIconClicked = {}
+            )
         }
     ) { paddingValues->
 
@@ -179,7 +198,10 @@ fun UpdateScreen(
                         text = "enter updated source",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(Modifier.height(30.dp))
@@ -194,7 +216,10 @@ fun UpdateScreen(
                         text = "enter updated username/LoginId",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
 
             Spacer(Modifier.height(30.dp))
@@ -209,22 +234,30 @@ fun UpdateScreen(
                         text = "enter updated password",
                         fontWeight = Bold
                     )
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                )
             )
 
             Spacer(Modifier.height(30.dp))
 
             OutlinedButton(
                 onClick = {
+                    if (source.isNotEmpty() && actualPassword.isNotEmpty() && username_Loginid.isNotEmpty()){
+                        homeScreenViewModel.updatePassword(
+                            newSrc = source,
+                            newPass = actualPassword,
+                            newLogin = username_Loginid,
+                            id = password.id
+                        )
+                        Toast.makeText(context,"Password updated successfully" , Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
+                    else{
+                        Toast.makeText(context,"Above field(s) cannot be empty" , Toast.LENGTH_SHORT).show()
+                    }
 
-                    homeScreenViewModel.updatePassword(
-                        newSrc = source,
-                        newPass = actualPassword,
-                        newLogin = username_Loginid,
-                        id = password.id
-                    )
-                    Toast.makeText(context,"Password updated successfully" , Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
                 }
             ) {
                 Text(
