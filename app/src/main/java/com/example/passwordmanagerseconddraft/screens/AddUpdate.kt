@@ -107,6 +107,7 @@ fun AddScreen(
                 onValueChange = {
                     password = it
                 },
+                visualTransformation = PasswordVisualTransformation(),
                 placeholder = {
                     Text(
                         text = "enter password",
@@ -229,6 +230,7 @@ fun UpdateScreen(
                 onValueChange = {
                     actualPassword = it
                 },
+                visualTransformation = PasswordVisualTransformation(),
                 placeholder = {
                     Text(
                         text = "enter updated password",
