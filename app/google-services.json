@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969957514139",
+    "project_id": "passwordmanager-2bf71",
+    "storage_bucket": "passwordmanager-2bf71.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969957514139:android:bade5496e1c6f2d11f5f3e",
+        "android_client_info": {
+          "package_name": "com.example.passwordmanagerseconddraft"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdbldD4Cuor05JzJ1ZcH14Dyaqf7P-N3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
