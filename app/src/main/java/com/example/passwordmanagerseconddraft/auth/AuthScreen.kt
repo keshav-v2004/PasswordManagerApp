@@ -32,6 +32,7 @@ fun LoginPage(
     authViewModel: AuthViewModel,
     navigateToSignupPage : ()->Unit,
     navigateToHomeScreen: () -> Unit,
+    navigateToLoadingScreen :() ->Unit,
     modifier: Modifier = Modifier
 ) {
     var email by rememberSaveable {
@@ -51,6 +52,7 @@ fun LoginPage(
                 (authViewModel.appAuthState as AuthViewModel.AppAuthState.Error).errorMessage,
                 Toast.LENGTH_SHORT
             ).show()
+            is AuthViewModel.AppAuthState.Loading -> navigateToLoadingScreen()
             else->Unit
         }
 
@@ -100,6 +102,7 @@ fun LoginPage(
 
                     if (email.isNotEmpty() && password.isNotEmpty()) {
                         authViewModel.login(email, password)
+                        navigateToLoadingScreen()
                         Toast.makeText(context , "Logging in" , Toast.LENGTH_SHORT).show()
 
 
@@ -127,6 +130,7 @@ fun SignupPage(
     authViewModel: AuthViewModel,
     navigateToLoginPage: () -> Unit,
     navigateToHomeScreen: () -> Unit,
+    navigateToLoadingScreen :() ->Unit,
     modifier: Modifier = Modifier
 ) {
     var email by rememberSaveable {
@@ -146,7 +150,8 @@ fun SignupPage(
                 (authViewModel.appAuthState as AuthViewModel.AppAuthState.Error).errorMessage ,
                 Toast.LENGTH_SHORT)
                 .show()
-            else->Unit
+            is AuthViewModel.AppAuthState.Loading -> navigateToLoadingScreen()
+            else ->Unit
         }
 
     }
@@ -194,7 +199,7 @@ fun SignupPage(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
                         authViewModel.signUp(email, password)
-
+                        navigateToLoadingScreen()
                         Toast.makeText(context , "Signing up" , Toast.LENGTH_SHORT).show()
 
                     }
@@ -218,8 +223,24 @@ fun SignupPage(
 
 @Composable
 fun LoadingScreen(
+    navigateToHomeScreen: () -> Unit,
+    navigateToLoginPage: () -> Unit,
+    authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = authViewModel.appAuthState) {
+        when(authViewModel.appAuthState){
+            is AuthViewModel.AppAuthState.authenticated -> navigateToHomeScreen()
+            is AuthViewModel.AppAuthState.unauthenticated -> navigateToLoginPage()
+            is AuthViewModel.AppAuthState.Error -> {
+                navigateToLoginPage()
+            }
+            else -> Unit
+        }
+    }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
