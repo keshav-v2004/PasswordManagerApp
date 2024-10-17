@@ -15,22 +15,29 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +54,7 @@ lateinit var setUpdateScreens : EachPassword
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     homeScreenViewModel: HomeScreenViewModel,
@@ -57,6 +65,109 @@ fun HomeScreen(
 
     val allPasswords by homeScreenViewModel.getAllPasswords().observeAsState()
 
+    var isDeletAccountAlertDialogVisible by remember {
+        mutableStateOf(false)
+    }
+
+    var isAccountDialogVisisble by remember {
+        mutableStateOf(false)
+    }
+
+    var isSignoutAlertDialogVisible by remember {
+        mutableStateOf(false)
+    }
+    val context = LocalContext.current
+
+    if (isDeletAccountAlertDialogVisible){
+        Box{
+            AlertDialog(
+                onDismissRequest = { isDeletAccountAlertDialogVisible = false },
+                title = {
+                    Text(text = "Are you sure to delete your account ? ")
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        homeScreenViewModel.deleteAllRecordsForAnAccount(
+                            currentUserId = authViewModel.auth.currentUser?.email.toString()
+                        )
+                        authViewModel.deleteAcc(context)
+                        navController.navigate(Screens.Loading.name)
+                    }) {
+                        Text(text = "Yes")
+                    }
+
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = {
+                        isDeletAccountAlertDialogVisible = false
+                    }) {
+                        Text(text = "Cancel")
+                    }
+                }
+
+            )
+        }
+
+    }
+
+    if (isSignoutAlertDialogVisible){
+        Box{
+            AlertDialog(
+                onDismissRequest = { isSignoutAlertDialogVisible = false },
+                title = {
+                    Text(text = "Are you sure to Signout ? ")
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        authViewModel.signOut()
+                        Toast.makeText(
+                            context,
+                            "Signing out",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navController.navigate(Screens.Loading.name)
+                    }) {
+                        Text(text = "Yes")
+                    }
+
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = {
+                        isSignoutAlertDialogVisible = false
+                    }) {
+                        Text(text = "Cancel")
+                    }
+                }
+
+            )
+        }
+
+    }
+
+    if (isAccountDialogVisisble){
+        AlertDialog(
+            onDismissRequest = {isAccountDialogVisisble = false},
+            confirmButton = {
+                Button(
+                    onClick = { isAccountDialogVisisble = false }
+                ) {
+                    Text(text = "Cancel")
+                }
+            },
+            title = {
+                Column {
+                    TextButton(onClick = { isSignoutAlertDialogVisible = true }) {
+                        Text(text = "Signout")
+                    }
+                    TextButton(onClick = { isDeletAccountAlertDialogVisible = true }) {
+                        Text(text = "Delete Account")
+                    }
+                }
+            },
+        )
+    }
+
+
     LaunchedEffect(key1 = authViewModel.appAuthState) {
         when(authViewModel.appAuthState){
             is AuthViewModel.AppAuthState.unauthenticated->navController.navigate(Screens.Login.name)
@@ -66,10 +177,13 @@ fun HomeScreen(
 
     }
 
-    val context = LocalContext.current
     Scaffold(
         topBar = {
-            AppHeading()
+            AppHeading(
+                accountIconClicked = {
+                    isAccountDialogVisisble = true
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -122,37 +236,9 @@ fun HomeScreen(
                         )
                     }
                 }
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(bottom = 25.dp)
-                ) {
-                    Button(
-                        colors = ButtonColors(
-                            containerColor = Color.Red,
-                            contentColor = Color.White,
-                            disabledContentColor = Color.Unspecified,
-                            disabledContainerColor = Color.Unspecified
-                        ),
-                        onClick = {
-                            authViewModel.signOut()
-                            Toast.makeText(
-                                context,
-                                "Signing out",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navController.navigate(Screens.Loading.name)
-                        }
-                    ) {
-                        Text(text = "SignOut")
-                    }
-                }
-
             }
 
 
-            Spacer(modifier = Modifier.weight(1f))
 
         }
     }
@@ -161,14 +247,33 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppHeading(
+    accountIconClicked:()->Unit,
     modifier: Modifier = Modifier
 ) {
     MediumTopAppBar(
         title = {
-            Text(
-                text = "Password Manager",
-                textAlign = TextAlign.Center
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Password Manager",
+                    textAlign = TextAlign.Left
+                )
+
+                Spacer(modifier = Modifier.width(110.dp))
+
+                IconButton(
+                    onClick = accountIconClicked
+                ) {
+                    Icon(
+                        Icons.Default.AccountBox,
+                        null
+                    )
+                }
+
+            }
 
         },
         colors = TopAppBarColors(
